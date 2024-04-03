@@ -11,6 +11,9 @@ import {
     JSONRPC,
     stringifyData
 } from '@vechain/sdk-errors';
+import type http from 'http';
+
+let serverInstance: http.Server | null = null;
 
 /**
  * Simple function to log an error.
@@ -49,7 +52,7 @@ function logRequest(requestBody: RequestBody, result: unknown): void {
  * * This is a simple proxy server that converts and forwards RPC requests to the vechain network.
  * * Don't use this in production, it's just for testing purposes.
  */
-function startProxy(): void {
+export function startProxy(): void {
     // Initialize the proxy server
     const config: Config = importConfig as Config;
     const port = config.port ?? 8545;
@@ -123,11 +126,23 @@ function startProxy(): void {
         })();
     });
 
-    app.listen(port, () => {
-        console.log(`[rpc-proxy]: Proxy is running on port ${port}`);
-    }).on('error', (err: Error) => {
-        console.error(`[rpc-proxy]: Error starting proxy: ${err.message}`);
-    });
+    serverInstance = app
+        .listen(port, () => {
+            console.log(`[rpc-proxy]: Proxy is running on port ${port}`);
+        })
+        .on('error', (err: Error) => {
+            console.error(`[rpc-proxy]: Error starting proxy: ${err.message}`);
+        });
+}
+
+export function stopProxy(): void {
+    if (serverInstance != null) {
+        serverInstance.close(() => {
+            console.log('[rpc-proxy]: Proxy server stopped');
+        });
+    } else {
+        console.warn('[rpc-proxy]: Proxy server is not running');
+    }
 }
 
 startProxy();

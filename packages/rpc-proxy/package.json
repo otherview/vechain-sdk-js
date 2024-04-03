@@ -23,7 +23,8 @@
     "build": "rm -rf ./dist && tsup src/index.ts --format cjs,esm --dts",
     "lint": "eslint --ext .ts src --ext .ts",
     "format": "prettier --write src/**/*.ts",
-    "start": "yarn build && node dist/index.js"
+    "start": "yarn build && node dist/index.js",
+    "test": "rm -rf ./coverageUnit && jest --coverage --coverageDirectory=coverageUnit --group=unit"
   },
   "dependencies": {
     "@vechain/sdk-network": "1.0.0-beta.2",
