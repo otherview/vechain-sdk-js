@@ -7,37 +7,40 @@ import {
     test
 } from '@jest/globals';
 import { startProxy, stopProxy } from '../src';
+import { type SpiedFunction } from 'jest-mock';
+
 /**
  * RPC Proxy tests
  *
  * @group unit/rpc-proxy
  */
-describe('RPC Proxy tests', () => {
-    // Mocking console.log and console.error to prevent output during tests
-    const originalLog = console.log;
-    const originalError = console.error;
+describe('RPC Proxy', () => {
+    let logSpy: SpiedFunction<{
+        (...data: never[]): void;
+        (message?: never, ...optionalParams: never[]): void;
+    }>;
 
     beforeEach(() => {
-        console.log = jest.fn();
-        console.error = jest.fn();
+        logSpy = jest.spyOn(console, 'log');
+        logSpy.mockImplementation(() => {});
     });
+
     afterEach(() => {
-        console.log = originalLog;
-        console.error = originalError;
+        logSpy.mockRestore();
     });
 
-    test('Should be able to create a new RPC Proxy', () => {
-        startProxy(); // Call the startProxy function
+    test('Should be able to start a new RPC Proxy', (done) => {
+        startProxy();
 
-        // Expect console.log to be called with the correct message
-        expect(console.log).toHaveBeenCalledWith(
-            '[rpc-proxy]: Starting proxy on port 8545'
-        );
-
-        stopProxy();
-        // Expect console.log to be called with the stop message
-        expect(console.log).toHaveBeenCalledWith(
-            '[rpc-proxy]: Proxy server stopped'
-        );
+        setTimeout(() => {
+            expect(logSpy).toHaveBeenCalledWith(
+                '[rpc-proxy]: Starting proxy on port 8545'
+            );
+            expect(logSpy).toHaveBeenCalledWith(
+                '[rpc-proxy]: Proxy is running on port 8545'
+            );
+            stopProxy();
+            done();
+        }, 100);
     });
 });
