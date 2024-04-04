@@ -6,8 +6,9 @@ import {
     jest,
     test
 } from '@jest/globals';
-import { startProxy, stopProxy } from '../src';
+import { app, startProxy, stopProxy } from '../src';
 import { type SpiedFunction } from 'jest-mock';
+import request from 'supertest';
 
 /**
  * RPC Proxy tests
@@ -43,4 +44,42 @@ describe('RPC Proxy', () => {
             done();
         }, 100);
     });
+
+    test('Should be able to start a new RPC Proxy', (done) => {
+        startProxy();
+
+        setTimeout(async () => {
+            const res = await request(app).post('/').send({
+                method: 'web3_clientVersion',
+                params: []
+            });
+            // HTTP Response Status Check
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toHaveProperty('result');
+            expect(typeof res.body.result).toBe('string');
+            setTimeout(() => {
+                stopProxy();
+            }, 3000);
+            done();
+        }, 100);
+    });
+
+    // test('Should return version information', async () => {
+    //     startProxy();
+    //     setTimeout(async () => {
+    //         const res = await request(app).post('/').send({
+    //             method: 'web3_clientVersion',
+    //             params: []
+    //         });
+    //
+    //         // HTTP Response Status Check
+    //         expect(res.statusCode).toEqual(200);
+    //
+    //         // Typically you'd check the response data structure here
+    //         // and probably some values too. This depends on your application.
+    //         expect(res.body).toHaveProperty('result');
+    //         expect(typeof res.body.result).toBe('string'); // Assuming result is a string, adjust as necessary
+    //         stopProxy();
+    //     }, 1000);
+    // });
 });

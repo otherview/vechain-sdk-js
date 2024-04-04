@@ -14,6 +14,7 @@ import {
 import type http from 'http';
 
 let serverInstance: http.Server | null = null;
+export let app: Express;
 
 /**
  * Simple function to log an error.
@@ -64,7 +65,7 @@ export function startProxy(): void {
     const provider = new VechainProvider(thorClient, wallet);
 
     // Start the express proxy server
-    const app: Express = express();
+    app = express();
     app.use(
         (cors as (options: cors.CorsOptions) => express.RequestHandler)({})
     );
