@@ -20,11 +20,14 @@
     "LICENSE"
   ],
   "scripts": {
+    "start-thor-solo": "echo 'Starting thor solo node ...' && docker compose up -d --wait && echo '\nThor solo node started ...'",
+    "stop-thor-solo": "echo 'Stopping thor solo node ...' && docker compose down && echo 'Thor solo node stopped ...'",
     "build": "rm -rf ./dist && tsup src/index.ts --format cjs,esm --dts",
     "lint": "eslint --ext .ts src --ext .ts",
     "format": "prettier --write src/**/*.ts",
     "start": "yarn build && node dist/index.js",
-    "test": "rm -rf ./coverageUnit && jest --coverage --coverageDirectory=coverageUnit --group=unit"
+    "test": "rm -rf ./coverageUnit && jest --coverage --coverageDirectory=coverageUnit --group=unit",
+    "test:solo": "(yarn start-thor-solo && yarn test && yarn stop-thor-solo) || yarn stop-thor-solo"
   },
   "dependencies": {
     "@vechain/sdk-logging": "1.0.0-beta.2",
