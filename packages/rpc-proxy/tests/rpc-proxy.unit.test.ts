@@ -57,10 +57,10 @@ describe('RPC Proxy', () => {
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('result');
             expect(typeof res.body.result).toBe('string');
-            setTimeout(() => {
-                stopProxy();
-            }, 3000);
-            done();
+
+            stopProxy();
+
+            setTimeout(() => done(), 1000);
         }, 100);
     });
 
